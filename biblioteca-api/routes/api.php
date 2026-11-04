@@ -1,21 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LivroController;
-use App\Http\Controllers\EmprestimoController; // Importe o controller
+use Illuminate\Http\Request;
+use App\Models\Livro; // Importa o teu Model Livro
 
-// Cria automaticamente as rotas GET, POST, PUT e DELETE para os livros
-// Rota para buscar livro em API Externa (Google Books)
-Route::get('livros/buscar-isbn/{isbn}', [LivroController::class, 'buscarPorIsbn']);
-Route::apiResource('livros', LivroController::class);
-Route::apiResource('emprestimos', EmprestimoController::class);
+Route::get('/livros', function (Request $request) {
+    // Pega o termo de pesquisa enviado pelo React (ex: ?q=m)
+    $termo = $request->query('q');
 
-use App\Http\Controllers\AuthController;
+    if ($termo) {
+        // Procura no banco de dados onde o título ou autor se parecem com o termo digitado
+        $livros = Livro::where('titulo', 'like', "%{$termo}%")
+                       ->orWhere('autor', 'like', "%{$termo}%")
+                       ->get();
+    } else {
+        // Se nada foi digitado, retorna todos os livros do banco
+        $livros = Livro::all();
+    }
 
-// Rota de Login (Aberta)
-Route::post('login', [AuthController::class, 'login']);
-
-// Rotas Protegidas (Precisam de Token / Estar logado)
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
+    return response()->json($livros);
 });

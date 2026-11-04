@@ -11,9 +11,19 @@ class LivroController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-       return response()->json(Livro::all(), 200);
+        // Se houver um termo de busca local na base de dados
+        $termo = $request->query('q');
+
+        if ($termo) {
+            $livros = Livro::where('titulo', 'like', "%{$termo}%")
+                           ->orWhere('autor', 'like', "%{$termo}%")
+                           ->get();
+            return response()->json($livros, 200);
+        }
+
+        return response()->json(Livro::all(), 200);
     }
 
     /**
@@ -69,30 +79,74 @@ class LivroController extends Controller
         return response()->json(['message' => 'Livro deletado com sucesso'], 200);
     }
 
-    // Método para buscar dados de um livro no Google Books pelo ISBN
-    // Método para buscar dados de um livro na Open Library pelo ISBN
-   // Método para buscar dados de um livro usando a Brasil API
+    /**
+     * Buscar dados de um livro no Google Books pelo ISBN
+     */
     public function buscarPorIsbn($isbn)
     {
-        // Faz a requisição para a Brasil API
-        $response = Http::withoutVerifying()->get("https://brasilapi.com.br/api/isbn/v1/" . $isbn);
+        // Faz a requisição para a API do Google Books usando o prefixo isbn:
+        $response = Http::withoutVerifying()->get("https://www.googleapis.com/books/v1/volumes", [
+            'q' => "isbn:{$isbn}"
+        ]);
 
-        // Se a API retornar erro (como 404), avisamos o usuário
         if ($response->failed()) {
-            return response()->json(['message' => 'Livro não encontrado na Brasil API'], 404);
+            return response()->json(['message' => 'Erro ao comunicar com a API do Google Books'], 500);
         }
 
         $dados = $response->json();
 
-        // Monta o objeto formatado com os dados que a Brasil API devolve
+        // Verifica se encontrou algum livro com este ISBN
+        if (empty($dados['items'])) {
+            return response()->json(['message' => 'Livro não encontrado no Google Books'], 404);
+        }
+
+        $info = $dados['items'][0]['volumeInfo'] ?? [];
+
+        // Mapeia os dados para o formato esperado
         $livroFormatado = [
-            'titulo' => $dados['title'] ?? 'Título desconhecido',
-            'autor' => isset($dados['authors'][0]) ? $dados['authors'][0] : 'Autor desconhecido',
-            'sinopse' => $dados['synopsis'] ?? 'Sem sinopse',
-            'url_capa' => $dados['cover_url'] ?? null,
+            'titulo' => $info['title'] ?? 'Título desconhecido',
+            'autor' => isset($info['authors']) ? implode(', ', $info['authors']) : 'Autor desconhecido',
+            'sinopse' => $info['description'] ?? 'Sem sinopse',
+            'url_capa' => $info['imageLinks']['thumbnail'] ?? null,
             'isbn' => $isbn
         ];
 
         return response()->json($livroFormatado, 200);
+    }
+
+    /**
+     * Pesquisar múltiplos livros por texto livre (Título/Autor) no Google Books
+     */
+    public function pesquisarGoogle(Request $request)
+    {
+        $termo = $request->query('q');
+
+        if (!$termo) {
+            return response()->json([], 200);
+        }
+
+        $response = Http::withoutVerifying()->get('https://www.googleapis.com/books/v1/volumes', [
+            'q' => $termo,
+            'maxResults' => 10
+        ]);
+
+        if ($response->failed()) {
+            return response()->json(['message' => 'Erro ao comunicar com a API do Google Books'], 500);
+        }
+
+        $dados = $response->json();
+
+        $livros = collect($dados['items'] ?? [])->map(function ($item) {
+            $info = $item['volumeInfo'] ?? [];
+            return [
+                'id' => $item['id'],
+                'titulo' => $info['title'] ?? 'Título desconhecido',
+                'autor' => isset($info['authors']) ? implode(', ', $info['authors']) : 'Autor desconhecido',
+                'sinopse' => $info['description'] ?? 'Sem sinopse',
+                'url_capa' => $info['imageLinks']['thumbnail'] ?? null,
+            ];
+        });
+
+        return response()->json($livros, 200);
     }
 }
