@@ -1,17 +1,62 @@
-import React, { useState, useEffect } from 'react';
+//TESTE DE LIVROS
+
+import React from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import Auth from './pages/Auth';
+import Livros from './pages/Livros';
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow">
+        <h1 className="font-bold text-lg">Sistema de Biblioteca</h1>
+        <div className="space-x-6">
+          <Link to="/" className="hover:underline">Login / Cadastro</Link>
+          <Link to="/livros" className="hover:underline">Acervo de Livros</Link>
+        </div>
+      </nav>
+
+      <div className="p-6">
+        <Routes>
+          <Route path="/" element={<Auth />} />
+          <Route path="/livros" element={<Livros />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
+
+
+
+/*
+!!!!!!TESTE DE AUTENTICACAO!!!!!!!!
+
+import React from 'react';
+import Auth from './pages/Auth';
+
+export default function App() {
+  return <Auth />;
+}
+
+*/
+
+/*import React, { useState, useEffect } from 'react';
+import api from './services/api'; // Importando a instância do Axios que vocês configuraram
+
 
 export default function App() {
   const [livros, setLivros] = useState([]);
   const [busca, setBusca] = useState('');
 
-  // Sempre que a variável 'busca' mudar, faz a requisição ao Laravel com o parâmetro ?q=
+  // Sempre que a variável 'busca' mudar, faz a requisição ao Laravel via Axios
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetch(`http://127.0.0.1:8000/api/livros?q=${encodeURIComponent(busca)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log('DADOS VINDOS DO LARAVEL:', data);
+      api.get(`/livros?q=${encodeURIComponent(busca)}`)
+        .then((response) => {
+          console.log('DADOS VINDOS DO LARAVEL:', response.data);
           
+          const data = response.data;
           if (Array.isArray(data)) {
             setLivros(data);
           } else if (data && Array.isArray(data.livros)) {
@@ -24,7 +69,7 @@ export default function App() {
           console.error('Erro na requisição:', err);
           setLivros([]);
         });
-    }, 300); // Pequeno atraso (debounce) para não disparar requisições a cada tecla muito rápido
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [busca]);
@@ -61,3 +106,4 @@ export default function App() {
     </div>
   );
 }
+  */

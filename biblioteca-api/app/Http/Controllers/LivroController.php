@@ -83,37 +83,29 @@ class LivroController extends Controller
      * Buscar dados de um livro no Google Books pelo ISBN
      */
     public function buscarPorIsbn($isbn)
-    {
-        // Faz a requisição para a API do Google Books usando o prefixo isbn:
-        $response = Http::withoutVerifying()->get("https://www.googleapis.com/books/v1/volumes", [
-            'q' => "isbn:{$isbn}"
-        ]);
+{
+    // Removemos caracteres especiais do ISBN caso tenham vindo com traços
+    $isbnLimpo = preg_replace('/[^0-9]/', '', $isbn);
 
-        if ($response->failed()) {
-            return response()->json(['message' => 'Erro ao comunicar com a API do Google Books'], 500);
-        }
+    $response = Http::withoutVerifying()->get("https://brasilapi.com.br/api/isbn/v1/{$isbnLimpo}");
 
-        $dados = $response->json();
-
-        // Verifica se encontrou algum livro com este ISBN
-        if (empty($dados['items'])) {
-            return response()->json(['message' => 'Livro não encontrado no Google Books'], 404);
-        }
-
-        $info = $dados['items'][0]['volumeInfo'] ?? [];
-
-        // Mapeia os dados para o formato esperado
-        $livroFormatado = [
-            'titulo' => $info['title'] ?? 'Título desconhecido',
-            'autor' => isset($info['authors']) ? implode(', ', $info['authors']) : 'Autor desconhecido',
-            'sinopse' => $info['description'] ?? 'Sem sinopse',
-            'url_capa' => $info['imageLinks']['thumbnail'] ?? null,
-            'isbn' => $isbn
-        ];
-
-        return response()->json($livroFormatado, 200);
+    if ($response->failed()) {
+        return response()->json(['message' => 'Livro não encontrado na BrasilAPI'], 404);
     }
 
+    $dados = $response->json();
+
+    // Mapeia os dados retornados pela BrasilAPI para o formato do seu banco
+    $livroFormatado = [
+        'titulo' => $dados['title'] ?? 'Título desconhecido',
+        'autor' => isset($dados['authors']) ? implode(', ', $dados['authors']) : 'Autor desconhecido',
+        'sinopse' => $dados['synopsis'] ?? 'Sem sinopse',
+        'url_capa' => $dados['cover_url'] ?? null,
+        'isbn' => $isbn
+    ];
+
+    return response()->json($livroFormatado, 200);
+}
     /**
      * Pesquisar múltiplos livros por texto livre (Título/Autor) no Google Books
      */
