@@ -1,0 +1,258 @@
+/* Container geral da página de acervo */
+.acervo-page {
+  width: 100%;
+  min-height: calc(100vh - 95px);
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eefb 50%, #dbeafe 100%);
+  padding: 2.5rem 2rem;
+  box-sizing: border-box;
+}
+
+/* Limitador de largura centralizado */
+.acervo-wrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Cabeçalho da página */
+.acervo-header {
+  margin-bottom: 2rem;
+}
+
+.acervo-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.025em;
+}
+
+.acervo-subtitle {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* Alerta de mensagens */
+.acervo-message {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background-color: #e0e7ff;
+  border-left: 4px solid #2563eb;
+  color: #1e40af;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.05);
+}
+
+/* Grid principal simétrico de 2 colunas */
+.acervo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .acervo-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .acervo-col-left {
+    grid-column: span 6;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Espaço exato e simétrico entre os dois blocos da esquerda */
+  }
+  .acervo-col-right {
+    grid-column: span 6;
+  }
+}
+
+/* Cartões Individuais Padronizados */
+.acervo-card {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acervo-card h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.25rem;
+}
+
+/* Formulários e Inputs */
+.acervo-form-group {
+  margin-bottom: 1rem;
+}
+
+.acervo-form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4b5563;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.025em;
+}
+
+.acervo-input-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.acervo-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.acervo-input:focus {
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.acervo-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.acervo-textarea:focus {
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.acervo-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Botões Modernos */
+.acervo-btn-buscar {
+  background-color: #059669;
+  color: white;
+  padding: 0 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.acervo-btn-buscar:hover {
+  background-color: #047857;
+}
+
+.acervo-btn-submit {
+  width: 100%;
+  background-color: #2563eb;
+  color: white;
+  padding: 0.85rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.acervo-btn-submit:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* Listagem de livros dimensionada e elegante */
+.acervo-list {
+  max-height: 620px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.acervo-book-item {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1rem;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  background: #ffffff;
+  margin-bottom: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.acervo-book-item:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.acervo-book-cover {
+  width: 55px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #f3f4f6;
+  flex-shrink: 0;
+}
+
+.acervo-book-info h3 {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.acervo-book-info p {
+  font-size: 0.85rem;
+  color: #4b5563;
+  margin: 0 0 0.5rem 0;
+}
+
+.acervo-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.acervo-tag-genre {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.acervo-tag-isbn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-family: monospace;
+}

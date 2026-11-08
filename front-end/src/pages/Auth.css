@@ -1,0 +1,116 @@
+/* Container principal para centralizar o painel na tela */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  min-height: calc(100vh - 95px);
+  background: linear-gradient(13deg, #f0f4ff 0%, #e8eefb 50%, #dbeafe 100%);
+  padding: 1rem;
+}
+/* Icone */
+.auth-icon {
+  font-size: 2.3rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Caixa/Painel do formulário */
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+  background: white;
+  border: 2px solid rgba(255, 255, 255,0.5);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Título */
+.auth-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: #1f2937; /* Cor escura e bem legível */
+  margin-bottom: 1.5rem;
+}
+
+/* Grupos de campos */
+.auth-group {
+  margin-bottom: 1rem;
+}
+
+.auth-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.auth-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  background-color:white;
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-group input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Botão principal de ação */
+.auth-button {
+  width: 100%;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.auth-button:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px); 
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3)
+}
+
+/* Link/Botão de alternância (Login/Cadastro) */
+.auth-switch {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.auth-switch button {
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-switch button:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Altera a cor do texto do placeholder */
+.auth-group input::placeholder {
+  color: #9ca3af; 
+}
