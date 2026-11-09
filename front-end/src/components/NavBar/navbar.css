@@ -5,34 +5,82 @@
 
 /* Barra de navegação principal */
 .navbar-container {
-  background-color: #2563eb; /* Equivalente ao bg-blue-600 do Tailwind */
-  color: #ffffff;            /* text-white */
-  padding: 1rem 2rem;             /* p-4 (16px) */
+  background-color: #2563eb;
+  color: #ffffff;            
+  padding: 1rem 2rem;        
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* Título do sistema */
 .navbar-title {
   font-weight: bold;
-  font-size: 1.125rem; /* text-lg */
+  font-size: 1.125rem;
   margin: 0;
 }
 
-/* Área que agrupa os links */
-.navbar-links {
-  display: flex;
-  gap: 1.5rem; /* Equivalente ao espaçamento space-x-6 (24px) */
-}
-
-/* Estilo individual dos links */
 .navbar-link {
   color: inherit;
   text-decoration: none;
 }
 
 .navbar-link:hover {
-  text-decoration: underline; /* hover:underline */
+  text-decoration: underline;
+}
+
+/* Área geral do utilizador (Avatar + Bloco de texto/botão) */
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-user-area {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* Círculo do avatar */
+.navbar-avatar-icon {
+  width: 38px;
+  height: 38px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bloco vertical para o nome e o botão */
+.navbar-user-details {
+  display: flex;
+  flex-direction: column; /* Coloca o botão estritamente abaixo do nome */
+  align-items: flex-start;
+  gap: 0.25rem; /* Pequeno espaçamento vertical entre o nome e o botão */
+}
+
+.navbar-greeting {
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+/* Botão de Sair ajustado para ficar compacto logo abaixo */
+.navbar-logout-btn {
+  background: transparent;
+  color: #fecaca; /* Vermelho claro suave */
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.navbar-logout-btn:hover {
+  color: #ffffff;
+  text-decoration: underline;
 }

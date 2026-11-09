@@ -8,19 +8,76 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  // URL base da sua API do Laravel
+  const API_URL = 'http://127.0.0.1:8000/api';
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isLogin) {
-      console.log('A fazer login com:', email, password);
-      // Aqui colocas a lógica de requisição para a API de login
-    } else {
-      if (password !== confirmPassword) {
-        alert('As senhas não coincidem!');
-        return;
+    try {
+      if (isLogin) {
+        // --- Requisição de Login ---
+        const response = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Erro ao fazer login.');
+        }
+
+        // Salva o token do Sanctum e os dados do usuário no navegador
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        console.log('Utilizador logado com sucesso:', data.user);
+        
+        // Redireciona diretamente para a página de livros sem mostrar alerta
+        window.location.href = '/livros';
+
+      } else {
+        // --- Validação e Requisição de Cadastro ---
+        if (password !== confirmPassword) {
+          alert('As senhas não coincidem!'); // Mantido apenas para validação visual rápida de erro de digitação
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          // Trata erros de validação do Laravel (ex: e-mail já existente)
+          const errorMessage = data.errors 
+            ? Object.values(data.errors)[0][0] 
+            : data.message;
+          throw new Error(errorMessage || 'Erro ao criar conta.');
+        }
+
+        // Salva o token gerado logo no cadastro
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        console.log('Utilizador registado com sucesso:', data.user);
+        
+        // Redireciona diretamente para a página de livros após cadastrar
+        window.location.href = '/livros';
       }
-      console.log('A registar utilizador com:', name, email, password);
-      // Aqui colocas a lógica de requisição para a API de registo
+    } catch (error) {
+      alert('Erro: ' + error.message); // Mantido no catch para avisar caso ocorra algum erro na API
     }
   };
 
@@ -67,6 +124,7 @@ export default function Auth() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="********" 
+              minLength={6}
               required
             />
           </div>
