@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Livro; 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class LivroController extends Controller
 {
@@ -13,7 +14,6 @@ class LivroController extends Controller
      */
     public function index(Request $request)
     {
-        // Se houver um termo de busca local na base de dados
         $termo = $request->query('q');
 
         if ($termo) {
@@ -31,7 +31,22 @@ class LivroController extends Controller
      */
     public function store(Request $request)
     {
-        $livro = Livro::create($request->all());
+        // Validação dos dados e do arquivo de capa
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'autor'  => 'required|string|max:255',
+            'capa'   => 'nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048', // Upload via arquivo (max 2MB)
+        ]);
+
+        $dados = $request->all();
+
+        // Trata o upload do arquivo de capa se for enviado um arquivo
+        if ($request->hasFile('capa')) {
+            $caminhoCapa = $request->file('capa')->store('capas', 'public');
+            $dados['url_capa'] = Storage::url($caminhoCapa);
+        }
+
+        $livro = Livro::create($dados);
         return response()->json($livro, 201);
     }
 
@@ -54,13 +69,26 @@ class LivroController extends Controller
      */
     public function update(Request $request, string $id)
     {
-       $livro = Livro::find($id);
+        $livro = Livro::find($id);
         
         if (!$livro) {
             return response()->json(['message' => 'Livro não encontrado'], 404);
         }
+
+        $dados = $request->all();
+
+        // Trata a atualização de arquivo de capa
+        if ($request->hasFile('capa')) {
+            // Apaga a capa antiga do storage se ela for um arquivo armazenado localmente
+            if ($livro->url_capa && Storage::disk('public')->exists(str_replace('/storage/', '', $livro->url_capa))) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $livro->url_capa));
+            }
+
+            $caminhoCapa = $request->file('capa')->store('capas', 'public');
+            $dados['url_capa'] = Storage::url($caminhoCapa);
+        }
         
-        $livro->update($request->all());
+        $livro->update($dados);
         return response()->json($livro, 200);
     }
 
@@ -69,10 +97,15 @@ class LivroController extends Controller
      */
     public function destroy(string $id)
     {
-       $livro = Livro::find($id);
+        $livro = Livro::find($id);
         
         if (!$livro) {
             return response()->json(['message' => 'Livro não encontrado'], 404);
+        }
+
+        // Remove a capa do storage ao deletar o livro
+        if ($livro->url_capa && Storage::disk('public')->exists(str_replace('/storage/', '', $livro->url_capa))) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $livro->url_capa));
         }
         
         $livro->delete();
@@ -80,32 +113,51 @@ class LivroController extends Controller
     }
 
     /**
+     * Baixar a imagem da capa do livro (Atende o requisito de Download do edital)
+     */
+    public function downloadCapa(string $id)
+    {
+        $livro = Livro::find($id);
+
+        if (!$livro || !$livro->url_capa) {
+            return response()->json(['message' => 'Capa não encontrada para este livro'], 404);
+        }
+
+        $caminhoRelativo = str_replace('/storage/', '', $livro->url_capa);
+
+        if (!Storage::disk('public')->exists($caminhoRelativo)) {
+            return response()->json(['message' => 'Arquivo físico não existe no servidor'], 404);
+        }
+
+        return Storage::disk('public')->download($caminhoRelativo);
+    }
+
+    /**
      * Buscar dados de um livro no Google Books pelo ISBN
      */
     public function buscarPorIsbn($isbn)
-{
-    // Removemos caracteres especiais do ISBN caso tenham vindo com traços
-    $isbnLimpo = preg_replace('/[^0-9]/', '', $isbn);
+    {
+        $isbnLimpo = preg_replace('/[^0-9]/', '', $isbn);
 
-    $response = Http::withoutVerifying()->get("https://brasilapi.com.br/api/isbn/v1/{$isbnLimpo}");
+        $response = Http::withoutVerifying()->get("https://brasilapi.com.br/api/isbn/v1/{$isbnLimpo}");
 
-    if ($response->failed()) {
-        return response()->json(['message' => 'Livro não encontrado na BrasilAPI'], 404);
+        if ($response->failed()) {
+            return response()->json(['message' => 'Livro não encontrado na BrasilAPI'], 404);
+        }
+
+        $dados = $response->json();
+
+        $livroFormatado = [
+            'titulo' => $dados['title'] ?? 'Título desconhecido',
+            'autor' => isset($dados['authors']) ? implode(', ', $dados['authors']) : 'Autor desconhecido',
+            'sinopse' => $dados['synopsis'] ?? 'Sem sinopse',
+            'url_capa' => $dados['cover_url'] ?? null,
+            'isbn' => $isbn
+        ];
+
+        return response()->json($livroFormatado, 200);
     }
 
-    $dados = $response->json();
-
-    // Mapeia os dados retornados pela BrasilAPI para o formato do seu banco
-    $livroFormatado = [
-        'titulo' => $dados['title'] ?? 'Título desconhecido',
-        'autor' => isset($dados['authors']) ? implode(', ', $dados['authors']) : 'Autor desconhecido',
-        'sinopse' => $dados['synopsis'] ?? 'Sem sinopse',
-        'url_capa' => $dados['cover_url'] ?? null,
-        'isbn' => $isbn
-    ];
-
-    return response()->json($livroFormatado, 200);
-}
     /**
      * Pesquisar múltiplos livros por texto livre (Título/Autor) no Google Books
      */

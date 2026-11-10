@@ -1,17 +1,25 @@
-# API Biblioteca - Entrega Parcial
+# Sistema de Gestão de Biblioteca (LMSystem)
 
-Esta é uma API RESTful desenvolvida em Laravel para o gerenciamento de uma biblioteca, incluindo o consumo de dados da Brasil API para validação de livros via ISBN e autenticação via Laravel Sanctum.
+Sistema web desenvolvido como projeto semestral, composto por uma API RESTful em Laravel e uma interface em React, com persistência em PostgreSQL e containerização via Docker.
 
-## Tecnologias Utilizadas
-* **Backend:** Laravel (PHP 8.2)
-* **Banco de Dados:** PostgreSQL (Supabase)
-* **Infraestrutura:** Docker e Docker Compose
+## 🛠 Tecnologias Utilizadas
+- **Front-end:** React (SPA)
+- **Back-end:** Laravel (PHP 8.2) com Sanctum (Autenticação) e Eloquent ORM[cite: 3, 5]
+- **Banco de Dados:** PostgreSQL (Supabase)[cite: 5]
+- **Infraestrutura:** Docker e Docker Compose[cite: 5]
 
-## Como rodar o projeto localmente com Docker
+---
 
-1. Certifique-se de ter o Docker Desktop instalado e rodando em sua máquina.
-2. Clone este repositório.
-3. Configure o arquivo `.env` com as credenciais do Supabase (banco de dados na nuvem).
-4. Abra o terminal na raiz do projeto e execute o comando:
+## 🚀 Como rodar o projeto localmente
+
+### Pré-requisitos
+- Docker e Docker Compose instalados e rodando na máquina[cite: 5].
+- PHP e Composer (caso queira rodar comandos do artisan localmente).
+- Node.js (para o front-end).
+
+### Passo a passo
+
+1. **Clone o repositório:**
    ```bash
-   docker-compose up --build
+   git clone <https://github.com/MClara-sz/LMSystem>
+   cd LMSystem

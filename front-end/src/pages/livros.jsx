@@ -17,6 +17,13 @@ export default function Livros() {
   const [urlCapa, setUrlCapa] = useState('');
   const [mensagem, setMensagem] = useState('');
 
+  // Lê o objeto user do localStorage e valida dinamicamente o perfil retornado pelo back-end
+  const userStorage = localStorage.getItem('user');
+  const user = userStorage ? JSON.parse(userStorage) : null;
+
+  // Verifica se o perfil é admin (compatível com o padrão retornado pela sua API)
+  const isAdmin = user?.perfil === 'admin' || user?.is_admin === true || user?.role === 'admin';
+
   const carregarLivros = async () => {
     try {
       const response = await api.get('/livros');
@@ -82,7 +89,11 @@ export default function Livros() {
       <div className="acervo-wrapper">
         <div className="acervo-header">
           <h1 className="acervo-title">Gestão de Acervo</h1>
-          <p className="acervo-subtitle">Consulte por ISBN ou cadastre novos livros na biblioteca.</p>
+          <p className="acervo-subtitle">
+            {isAdmin 
+              ? "Consulte por ISBN ou cadastre novos livros na biblioteca." 
+              : "Consulte os livros cadastrados no acervo da biblioteca."}
+          </p>
         </div>
 
         {mensagem && (
@@ -92,24 +103,28 @@ export default function Livros() {
         )}
 
         <div className="acervo-grid">
-          <div className="acervo-col-left">
-            <BuscaIsbn 
-              isbnBusca={isbnBusca} 
-              setIsbnBusca={setIsbnBusca} 
-              onBuscar={handleBuscarPorIsbn} 
-            />
-            
-            <FormularioLivro 
-              titulo={titulo} setTitulo={setTitulo}
-              autor={autor} setAutor={setAutor}
-              genero={genero} setGenero={setGenero}
-              isbn={isbn} setIsbn={setIsbn}
-              sinopse={sinopse} setSinopse={setSinopse}
-              onSubmit={handleCadastrarLivro}
-            />
-          </div>
+          {/* A coluna da esquerda com Busca e Cadastro aparece APENAS para Admin */}
+          {isAdmin && (
+            <div className="acervo-col-left">
+              <BuscaIsbn 
+                isbnBusca={isbnBusca} 
+                setIsbnBusca={setIsbnBusca} 
+                onBuscar={handleBuscarPorIsbn} 
+              />
+              
+              <FormularioLivro 
+                titulo={titulo} setTitulo={setTitulo}
+                autor={autor} setAutor={setAutor}
+                genero={genero} setGenero={setGenero}
+                isbn={isbn} setIsbn={setIsbn}
+                sinopse={sinopse} setSinopse={setSinopse}
+                onSubmit={handleCadastrarLivro}
+              />
+            </div>
+          )}
 
-          <div className="acervo-col-right">
+          {/* A listagem da direita se ajusta para ocupar a tela inteira se o usuário for visitante */}
+          <div className={isAdmin ? "acervo-col-right" : "acervo-col-right w-full"}>
             <ListaLivros livros={livros} />
           </div>
         </div>

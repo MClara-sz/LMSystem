@@ -15,6 +15,7 @@ Route::get('/livros', [LivroController::class, 'index']);
 Route::get('/livros/isbn/{isbn}', [LivroController::class, 'buscarPorIsbn']);
 Route::get('/livros/google', [LivroController::class, 'pesquisarGoogle']);
 Route::get('/livros/{id}', [LivroController::class, 'show']);
+Route::get('/livros/{id}/download-capa', [LivroController::class, 'downloadCapa']);
 
 // Rotas Protegidas (Exigem autenticação por Token Sanctum para QUALQUER utilizador logado)
 Route::middleware('auth:sanctum')->group(function () {
@@ -24,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/emprestimos', [EmprestimoController::class, 'index']);
     Route::post('/emprestimos', [EmprestimoController::class, 'store']);
     Route::get('/emprestimos/{id}', [EmprestimoController::class, 'show']);
+    
 });
 
 // Rotas RESTRITAS APENAS A ADMINISTRADORES (Exigem Sanctum + AdminMiddleware)
