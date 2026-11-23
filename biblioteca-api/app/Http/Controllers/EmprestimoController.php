@@ -7,57 +7,86 @@ use App\Models\Emprestimo;
 
 class EmprestimoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Emprestimo::all(), 200);
+        $user = $request->user();
+        $query = Emprestimo::with('livro');
+
+        if ($user->role !== 'admin') {
+            $query->where('usuario_id', $user->id);
+        }
+
+        return response()->json($query->get(), 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $emprestimo = Emprestimo::create($request->all());
-        return response()->json($emprestimo, 201);
+        $dados = $request->validate([
+            'livro_id' => 'required|exists:livros,id',
+            'data_emprestimo' => 'nullable|date',
+            'data_devolucao_prevista' => 'required|date',
+            'situacao' => 'nullable|string',
+            'usuario_id' => 'nullable|exists:users,id',
+        ]);
+
+        // Apenas admins podem criar empréstimo em nome de outro utilizador
+        if ($request->user()->role === 'admin' && !empty($dados['usuario_id'])) {
+            $dados['usuario_id'] = $dados['usuario_id'];
+        } else {
+            $dados['usuario_id'] = $request->user()->id;
+        }
+
+        $dados['data_emprestimo'] = $dados['data_emprestimo'] ?? now()->toDateString();
+        $dados['situacao'] = $dados['situacao'] ?? 'ativo';
+
+        $emprestimo = Emprestimo::create($dados);
+
+        return response()->json($emprestimo->load('livro'), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-       $emprestimo = Emprestimo::find($id);
+        $emprestimo = Emprestimo::with('livro')->find($id);
         if (!$emprestimo) {
             return response()->json(['message' => 'Empréstimo não encontrado'], 404);
         }
+
+        if ($request->user()->role !== 'admin' && (int) $emprestimo->usuario_id !== (int) $request->user()->id) {
+            return response()->json(['message' => 'Acesso não autorizado.'], 403);
+        }
+
         return response()->json($emprestimo, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $emprestimo = Emprestimo::find($id);
         if (!$emprestimo) {
             return response()->json(['message' => 'Empréstimo não encontrado'], 404);
         }
-        $emprestimo->update($request->all());
-        return response()->json($emprestimo, 200);
+
+        if ($request->user()->role !== 'admin' && (int) $emprestimo->usuario_id !== (int) $request->user()->id) {
+            return response()->json(['message' => 'Você só pode devolver os seus próprios empréstimos.'], 403);
+        }
+
+        $dados = $request->validate([
+            'situacao' => 'nullable|string',
+            'data_devolucao_real' => 'nullable|date',
+            'data_devolucao_prevista' => 'nullable|date',
+        ]);
+
+        $emprestimo->update($dados);
+
+        return response()->json($emprestimo->load('livro'), 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $emprestimo = Emprestimo::find($id);
         if (!$emprestimo) {
             return response()->json(['message' => 'Empréstimo não encontrado'], 404);
         }
+
         $emprestimo->delete();
         return response()->json(['message' => 'Deletado com sucesso'], 200);
     }

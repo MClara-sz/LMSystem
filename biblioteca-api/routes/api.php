@@ -21,11 +21,11 @@ Route::get('/livros/{id}/download-capa', [LivroController::class, 'downloadCapa'
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Gestão de Empréstimos (Utilizadores comuns podem ver e criar os seus empréstimos)
+    // Gestão de Empréstimos (Utilizadores comuns podem ver, criar e devolver os seus empréstimos)
     Route::get('/emprestimos', [EmprestimoController::class, 'index']);
     Route::post('/emprestimos', [EmprestimoController::class, 'store']);
     Route::get('/emprestimos/{id}', [EmprestimoController::class, 'show']);
-    
+    Route::put('/emprestimos/{id}', [EmprestimoController::class, 'update']);
 });
 
 // Rotas RESTRITAS APENAS A ADMINISTRADORES (Exigem Sanctum + AdminMiddleware)
@@ -35,7 +35,6 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->group(function () {
     Route::put('/livros/{id}', [LivroController::class, 'update']);
     Route::delete('/livros/{id}', [LivroController::class, 'destroy']);
 
-    // Gestão avançada de Empréstimos (Apenas admins podem alterar ou apagar registos globais)
-    Route::put('/emprestimos/{id}', [EmprestimoController::class, 'update']);
+    // Gestão avançada de Empréstimos (Apenas admins podem apagar registos)
     Route::delete('/emprestimos/{id}', [EmprestimoController::class, 'destroy']);
 });

@@ -96,21 +96,26 @@ class LivroController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-        $livro = Livro::find($id);
-        
-        if (!$livro) {
-            return response()->json(['message' => 'Livro não encontrado'], 404);
-        }
+{
+    $livro = Livro::find($id);
 
-        // Remove a capa do storage ao deletar o livro
+    if (!$livro) {
+        return response()->json(['message' => 'Livro não encontrado'], 404);
+    }
+
+    try {
         if ($livro->url_capa && Storage::disk('public')->exists(str_replace('/storage/', '', $livro->url_capa))) {
             Storage::disk('public')->delete(str_replace('/storage/', '', $livro->url_capa));
         }
-        
+
         $livro->delete();
         return response()->json(['message' => 'Livro deletado com sucesso'], 200);
+    } catch (\Illuminate\Database\QueryException $e) {
+        return response()->json([
+            'message' => 'Não é possível excluir este livro porque existem empréstimos vinculados a ele.'
+        ], 409);
     }
+}
 
     /**
      * Baixar a imagem da capa do livro (Atende o requisito de Download do edital)

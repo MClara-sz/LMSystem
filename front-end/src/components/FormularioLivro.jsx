@@ -4,11 +4,14 @@ export default function FormularioLivro({
   genero, setGenero,
   isbn, setIsbn,
   sinopse, setSinopse,
-  onSubmit
+  arquivoCapa, setArquivoCapa,
+  onSubmit,
+  editando = false,
+  onCancelarEdicao,
 }) {
   return (
     <div className="acervo-card">
-      <h2>Cadastrar Novo Livro</h2>
+      <h2>{editando ? 'Editar Livro' : 'Cadastrar Novo Livro'}</h2>
       <form onSubmit={onSubmit}>
         <div className="acervo-form-group">
           <label>Título</label>
@@ -60,6 +63,21 @@ export default function FormularioLivro({
         </div>
 
         <div className="acervo-form-group">
+          <label>Capa do Livro (opcional)</label>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/jpg,image/gif"
+            onChange={(e) => setArquivoCapa(e.target.files?.[0] || null)}
+            className="acervo-input"
+          />
+          {arquivoCapa && (
+            <small style={{ color: '#4b5563', display: 'block', marginTop: '0.25rem' }}>
+              Arquivo selecionado: {arquivoCapa.name}
+            </small>
+          )}
+        </div>
+
+        <div className="acervo-form-group">
           <label>Sinopse</label>
           <textarea
             placeholder="Resumo da história..."
@@ -70,9 +88,29 @@ export default function FormularioLivro({
           />
         </div>
 
-        <button type="submit" className="acervo-btn-submit">
-          Salvar Livro no Acervo
-        </button>
+        <div style={{ display: 'flex', gap: '0.6rem' }}>
+          <button type="submit" className="acervo-btn-submit" style={{ flex: 1 }}>
+            {editando ? 'Atualizar Livro' : 'Salvar Livro no Acervo'}
+          </button>
+
+          {editando && (
+            <button
+              type="button"
+              onClick={onCancelarEdicao}
+              style={{
+                background: '#e5e7eb',
+                color: '#374151',
+                border: 'none',
+                padding: '0.75rem 1rem',
+                borderRadius: '8px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );
