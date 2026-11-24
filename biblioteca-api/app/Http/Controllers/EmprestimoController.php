@@ -10,7 +10,7 @@ class EmprestimoController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $query = Emprestimo::with('livro');
+        $query = Emprestimo::with(['livro', 'usuario']);
 
         if ($user->role !== 'admin') {
             $query->where('usuario_id', $user->id);

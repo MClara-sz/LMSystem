@@ -54,6 +54,17 @@
 }
 
 @media (min-width: 1024px) {
+
+  .acervo-col-right.acervo-col-user {
+    grid-column: span 7;
+  }
+  .acervo-col-detalhes-user {
+    grid-column: span 5;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
   .acervo-grid {
     grid-template-columns: repeat(12, 1fr);
   }

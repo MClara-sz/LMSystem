@@ -22,6 +22,20 @@ export default function Emprestimos() {
 
   const storedUser = localStorage.getItem('user');
   const user = storedUser ? JSON.parse(storedUser) : null;
+  const isAdmin =
+    user?.role === 'admin' ||
+    user?.perfil === 'admin' ||
+    user?.is_admin === true;
+
+  const formatarUsuario = (item) => {
+    const u = item.usuario || item.user;
+    if (!u) {
+      return item.usuario_id ? `Usuário #${item.usuario_id}` : '-';
+    }
+    const nome = u.name || u.nome || u.email || `Usuário #${item.usuario_id}`;
+    const perfil = u.role || u.perfil;
+    return perfil ? `${nome} (${perfil})` : nome;
+  };
 
   const carregarDados = async () => {
     setCarregando(true);
@@ -158,6 +172,7 @@ export default function Emprestimos() {
             <thead>
               <tr style={{ background: '#f8fafc', color: '#475569', fontSize: '0.85rem', textTransform: 'uppercase' }}>
                 <th style={{ padding: '1rem' }}>Livro</th>
+                {isAdmin && <th style={{ padding: '1rem' }}>Usuário / Perfil</th>}
                 <th style={{ padding: '1rem' }}>Data Empréstimo</th>
                 <th style={{ padding: '1rem' }}>Devolução Prevista</th>
                 <th style={{ padding: '1rem' }}>Situação</th>
@@ -167,7 +182,7 @@ export default function Emprestimos() {
             <tbody>
               {emprestimosAtivos.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
+                  <td colSpan={isAdmin ? 6 : 5} style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
                     Nenhum empréstimo ativo no momento.
                   </td>
                 </tr>
@@ -177,6 +192,11 @@ export default function Emprestimos() {
                     <td style={{ padding: '1rem', fontWeight: '600', color: '#1e293b' }}>
                       {item.livro?.titulo || item.livro_titulo || `Livro #${item.livro_id}`}
                     </td>
+                    {isAdmin && (
+                      <td style={{ padding: '1rem', color: '#475569' }}>
+                        {formatarUsuario(item)}
+                      </td>
+                    )}
                     <td style={{ padding: '1rem', color: '#64748b' }}>
                       {item.data_emprestimo || item.dataEmprestimo || '-'}
                     </td>
@@ -204,6 +224,7 @@ export default function Emprestimos() {
             <thead>
               <tr style={{ background: '#f8fafc', color: '#475569', fontSize: '0.85rem', textTransform: 'uppercase' }}>
                 <th style={{ padding: '1rem' }}>Livro</th>
+                {isAdmin && <th style={{ padding: '1rem' }}>Usuário / Perfil</th>}
                 <th style={{ padding: '1rem' }}>Data da Devolução</th>
                 <th style={{ padding: '1rem' }}>Situação</th>
               </tr>
@@ -211,7 +232,7 @@ export default function Emprestimos() {
             <tbody>
               {historico.length === 0 ? (
                 <tr>
-                  <td colSpan="3" style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
+                  <td colSpan={isAdmin ? 4 : 3} style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>
                     Nenhuma devolução registrada ainda.
                   </td>
                 </tr>
@@ -221,6 +242,11 @@ export default function Emprestimos() {
                     <td style={{ padding: '1rem', fontWeight: '600', color: '#1e293b' }}>
                       {item.livro?.titulo || `Livro #${item.livro_id}`}
                     </td>
+                    {isAdmin && (
+                      <td style={{ padding: '1rem', color: '#475569' }}>
+                        {formatarUsuario(item)}
+                      </td>
+                    )}
                     <td style={{ padding: '1rem', color: '#64748b' }}>
                       {item.data_devolucao_real || item.data_devolucao || '-'}
                     </td>

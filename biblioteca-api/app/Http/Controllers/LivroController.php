@@ -138,7 +138,7 @@ class LivroController extends Controller
     }
 
     /**
-     * Buscar dados de um livro no Google Books pelo ISBN
+
      */
     public function buscarPorIsbn($isbn)
     {

@@ -1,9 +1,9 @@
 <?php
 
-
 namespace App\Models;
 
 use App\Models\Livro;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Emprestimo extends Model
@@ -20,5 +20,10 @@ class Emprestimo extends Model
     public function livro()
     {
         return $this->belongsTo(Livro::class, 'livro_id');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 }

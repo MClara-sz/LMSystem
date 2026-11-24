@@ -58,4 +58,36 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Logout realizado com sucesso'], 200);
     }
+
+    // Função para atualizar dados do perfil do utilizador autenticado
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $dados = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'senha_atual' => 'nullable|string',
+            'nova_senha' => 'nullable|string|min:6',
+        ]);
+
+        if (!empty($dados['nova_senha'])) {
+            if (empty($dados['senha_atual']) || !Hash::check($dados['senha_atual'], $user->password)) {
+                return response()->json([
+                    'message' => 'A palavra-passe atual está incorreta.',
+                ], 422);
+            }
+
+            $user->password = Hash::make($dados['nova_senha']);
+        }
+
+        $user->name = $dados['name'];
+        $user->email = $dados['email'];
+        $user->save();
+
+        return response()->json([
+            'message' => 'Perfil atualizado com sucesso.',
+            'user' => $user,
+        ], 200);
+    }
 }

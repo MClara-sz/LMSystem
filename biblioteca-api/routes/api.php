@@ -20,6 +20,7 @@ Route::get('/livros/{id}/download-capa', [LivroController::class, 'downloadCapa'
 // Rotas Protegidas (Exigem autenticação por Token Sanctum para QUALQUER utilizador logado)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::put('/perfil', [AuthController::class, 'updateProfile']);
 
     // Gestão de Empréstimos (Utilizadores comuns podem ver, criar e devolver os seus empréstimos)
     Route::get('/emprestimos', [EmprestimoController::class, 'index']);
